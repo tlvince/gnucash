@@ -5,7 +5,7 @@
 
 pkgname=gnucash
 pkgver=3.0
-pkgrel=1
+pkgrel=2
 pkgdesc="A personal and small-business financial-accounting application"
 arch=('i686' 'x86_64')
 url="http://www.gnucash.org"
@@ -40,7 +40,7 @@ prepare() {
 build() {
   cd "${srcdir}/build"
 
-  make -j $(cat /proc/cpuinfo | grep -ci '^processor')
+  make -j $(nproc)
 }
 
 package() {

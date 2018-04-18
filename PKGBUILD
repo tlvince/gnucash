@@ -3,15 +3,17 @@
 # Contributor: Juergen Hoetzel <juergen@archlinux.org>
 # Contributor: Mark Schneider <queueRAM@gmail.com>
 
-pkgname=gnucash
-pkgver=3.0
-pkgrel=4
+pkgname=gnucash-git
+_pkgname=gnucash
+__pkgname=Gnucash
+pkgver=3.0.r83.gcad6bb427
+pkgrel=1
 pkgdesc="A personal and small-business financial-accounting application"
 arch=('i686' 'x86_64')
 url="http://www.gnucash.org"
 license=("GPL")
 depends=('libmariadbclient' 'postgresql-libs' 'aqbanking' 'webkit2gtk' 'boost-libs' 'libsecret' 'libdbi-drivers' 'guile')
-makedepends=('boost' 'gmock' 'gwenhywfar' 'cmake')
+makedepends=('boost' 'gmock' 'gwenhywfar' 'cmake' 'swig')
 optdepends=(
 	'gnucash-docs: for documentation'
 	'iso-codes: for translation of currency names'
@@ -19,15 +21,22 @@ optdepends=(
 	'perl-date-manip: for stock information lookups'
 )
 options=('!emptydirs')
-source=(
-	http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pkgver}.tar.bz2
-)
-sha1sums=('a575e853668b93b34dcd94f0ef0d1fee25b0165f')
-sha256sums=('4c754476a5b80a97abacaeadac64fefc5a68fcfec15967908dbe3c9f7370dbb9')
-sha512sums=('5ec13b8abe1520a7e614ceeca4c41d5dba3ebae4ec965918584963022ceb5cb3b85862289a85a72767db74a0c735214a78342a53c37e6da939ff850538174a87')
+source=("$pkgname::git+https://github.com/${__pkgname}/${_pkgname}.git")
+sha256sums=('SKIP')
 backup=(
 	'etc/gnucash/environment'
 )
+conflicts=('gnucash')
+provides=('gnucash')
+
+pkgver() {
+	cd "$srcdir/$pkgname"
+
+	( set -o pipefail
+	  git describe --long --tags 2>/dev/null | sed 's/\([^-]*-g\)/r\1/;s/-/./g' ||
+	  printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+	)
+}
 
 prepare() {
   cd "${srcdir}"
@@ -40,7 +49,7 @@ prepare() {
 	-DCOMPILE_GSCHEMAS=NO \
 	-DWITH_OFX=ON \
 	-DWITH_AQBANKING=ON \
-	"${srcdir}/${pkgname}-${pkgver}"
+	"${srcdir}/${pkgname}"
 
 }
 
